@@ -1,166 +1,92 @@
 #include <iostream>
 
-class Vector
+class Player // 游戏玩家，抽象类
 {
-private:
-    const char *Name_; // 向量名称
-    int Dimension_;    // 向量维数
-    double *Memory_;   // 向量数组
-
 public:
-    Vector(int Dimension, const char *Name) : Dimension_(Dimension), Name_(Name) // 手动赋值构造函数
-    {
-        if (Dimension_ == 0) // 判断向量是否为0
-        {
-            exit(1);
-        }
+    Player(size_t Health, size_t Energy) : Health_(Health), Energy_(Energy) {}
+    virtual void Technique() = 0; // 输出技能，纯虚函数
+    static size_t Ammunition;     // 弹药量，静态成员变量
 
-        Memory_ = new double[Dimension_]; // 申请内存
-        if (Memory_ == nullptr)           // 判断是否申请成功
-        {
-            std::cout << Name_ << " 创建失败！" << std::endl;
-            exit(1);
-        }
-        std::cout << Name_ << " 创建成功！" << std::endl;
+    void PrintStatus(void) // 输出生命值和能量值
+    {
+        std::cout << "Health: " << Health_ << ", Energy: " << Energy_ << std::endl;
     }
 
-    Vector(const Vector &other, const char *NewName) // 深拷贝构造函数
+protected:
+    size_t Health_; // 生命值
+    size_t Energy_; // 能量值
+};
+
+class Raiders : public Player // 突击兵，继承自 Player 类
+{
+public:
+    Raiders(size_t Health, size_t Energy) : Player(Health, Energy) {}
+
+    void Technique() override // 技能输出
     {
-        if (other.Dimension_ == 0) // 判断向量是否为0
-        {
-            exit(1);
-        }
-
-        this->Dimension_ = other.Dimension_;          // 维数复制
-        this->Name_ = NewName;                        // 名称复制
-        this->Memory_ = new double[this->Dimension_]; // 申请内存
-
-        if (this->Memory_ == nullptr) // 判断是否申请成功
-        {
-            std::cout << this->Name_ << " 创建失败！" << std::endl;
-            exit(1);
-        }
-        for (uint8_t i = 0; i < this->Dimension_; i++) // 向量值填入
-        {
-            this->Memory_[i] = other.Memory_[i];
-        }
-
-        std::cout << this->Name_ << " 拷贝成功！" << std::endl;
-    }
-
-    Vector operator+(const Vector &V1) // 向量相加函数
-    {
-        if (V1.Dimension_ != this->Dimension_)
-        {
-            std::cout << "向量相加失败，维数不统一！" << std::endl;
-            exit(1);
-        }
-        Vector SumVector(3, "SumVector");
-        for (uint8_t i = 0; i < this->Dimension_; i++)
-        {
-            SumVector.Memory_[i] = this->Memory_[i] + V1.Memory_[i];
-        }
-        return SumVector;
-    }
-
-    Vector operator-(const Vector &V1) // 向量相减函数
-    {
-        if (V1.Dimension_ != this->Dimension_)
-        {
-            std::cout << "向量相减失败，维数不统一！" << std::endl;
-            exit(1);
-        }
-        Vector LessVector(3, "LessVector");
-        for (uint8_t i = 0; i < this->Dimension_; i++)
-        {
-            LessVector.Memory_[i] = this->Memory_[i] - V1.Memory_[i];
-        }
-        return LessVector;
-    }
-
-    Vector operator*(const Vector &V1) // 向量点乘函数
-    {
-        if (V1.Dimension_ != this->Dimension_)
-        {
-            std::cout << "向量点乘失败，维数不统一！" << std::endl;
-            exit(1);
-        }
-        Vector MulVector(3, "MulVector");
-        for (uint8_t i = 0; i < this->Dimension_; i++)
-        {
-            MulVector.Memory_[i] = this->Memory_[i] * V1.Memory_[i];
-        }
-        return MulVector;
-    }
-
-    void operator=(const Vector &other) // 向量赋值（深拷贝）
-    {
-        if (this->Dimension_ != other.Dimension_)
-        {
-            std::cout << "赋值失败，维数不统一！" << std::endl;
-        }
-
-        for (uint8_t i = 0; i < this->Dimension_; i++)
-        {
-            this->Memory_[i] = other.Memory_[i];
-        }
-    }
-
-    void Vector_Printf(void) // 打印向量
-    {
-        std::cout << this->Name_ << '[';
-        for (uint8_t i = 0; i < this->Dimension_; i++) // 向量值填入
-        {
-            std::cout << this->Memory_[i] << "\t";
-        }
-        std::cout << ']' << std::endl;
-    }
-
-    const double operator[](int Number) const // 读取单个向量
-    {
-        if (Number >= this->Dimension_)
-        {
-            exit(1);
-        }
-        return this->Memory_[Number];
-    }
-
-    double &operator[](int Number) // 向量赋值
-    {
-        if (Number >= this->Dimension_)
-        {
-            exit(1);
-        }
-        return this->Memory_[Number];
-    }
-
-    ~Vector() // 析构函数清空内存
-    {
-        delete[] (this->Memory_);
-        this->Memory_ = nullptr;
+        std::cout << "Raiders" << std::endl;
     }
 };
 
+class Medical_Soldier final : public Player // 医疗兵，继承自 Player 类
+{
+public:
+    Medical_Soldier(size_t Health, size_t Energy) : Player(Health, Energy) {}
+
+    void Technique() override // 技能输出
+    {
+        std::cout << "Medical_Soldier" << std::endl;
+    }
+};
+
+class Investigator final : public Player // 侦察兵，继承自 Player 类
+{
+public:
+    Investigator(size_t Health, size_t Energy) : Player(Health, Energy) {}
+    void Technique() override // 技能输出
+    {
+        std::cout << "Investigator" << std::endl;
+    }
+};
+
+class Engineer_Raiders final : public Raiders // 工程突击兵，继承突击兵类
+{
+public:
+    Engineer_Raiders(size_t Health, size_t Energy) : Raiders(Health, Energy) {}
+
+    void Technique() override // 技能输出
+    {
+        std::cout << "Engineer_Raiders" << std::endl;
+    }
+};
+
+size_t Player::Ammunition = 1000; // 弹药，静态成员变量初始化
+
 int main(void)
 {
-    Vector Vector1(3, "Vector1");
-    Vector1[0] = 1.1;
-    Vector1[1] = 3.2;
-    Vector1[2] = 4.1;
-    Vector1.Vector_Printf();
+    Raiders R1(100, 100); // 创建突击兵对象 R1
+    R1.PrintStatus();
+    R1.Technique();
 
-    Vector Vector2(Vector1, "Vector2");
-    Vector2.Vector_Printf();
+    Engineer_Raiders E1(100, 80); // 创建工程突击兵对象 E1
+    E1.PrintStatus();
+    E1.Technique();
+    E1.Raiders::Technique();
 
-    Vector SumVector(3, "SumVector");
-    SumVector = Vector1 + Vector2;
-    SumVector.Vector_Printf();
+    Medical_Soldier M1(80, 50); // 创建医疗兵对象 M1
+    M1.PrintStatus();
+    M1.Technique();
 
-    Vector LessVector(3, "LessVector");
-    LessVector = Vector1 - Vector2;
-    LessVector.Vector_Printf();
+    Investigator I1(90, 60); // 创建侦察兵对象 I1
+    I1.PrintStatus();
+    I1.Technique();
 
-    Vector MulVector(3, "MulVector");
-    MulVector = Vector1 * Vector2;
-    MulVector.Vector_Printf();
+    Player *P = &R1; // 多态
+    P->Technique();  // 调用突击兵的技能输出
+
+    std::cout << "R1-Ammunition:" << R1.Ammunition << std::endl; // 输出弹药量
+    std::cout << "E1-Ammunition:" << E1.Ammunition << std::endl;
+    std::cout << "M1-Ammunition:" << M1.Ammunition << std::endl;
+    std::cout << "I1-Ammunition:" << I1.Ammunition << std::endl;
+    std::cout << "P-Ammunition:" << P->Ammunition << std::endl; // 输出多态指针的弹药量
 }
